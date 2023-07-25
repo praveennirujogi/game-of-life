@@ -1,0 +1,37 @@
+pieline {
+    agent { label 'JDK_8' }
+    options {
+        timeout(time: 30, unit: 'minutes') 
+    }
+    triggers {
+        pollSCM('* * * * *')
+    }
+    tools {
+        jdk 'JDK_8'
+    }
+    stages { p
+        stage('vcs') {
+            steps {
+                git url: 'https://github.com/wakaleo/game-of-life.git',
+                 branch: 'develop'
+
+            }
+        }
+        stage('bulit and package'){
+            steps{
+                sh script: 'mvn package'
+            }
+        }
+        stage('reporting'){
+            steps{
+                archiveArtifacts artifacts: '**/target/gameoflife-*.war'
+                junit testResults: '**/target/surefire-reports/TEST-*.xml'
+            }
+        }
+
+          
+        
+        
+
+    }
+}
